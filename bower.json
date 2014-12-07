@@ -1,0 +1,26 @@
+{
+  "name": "tag-editor",
+  "version": "1.0.0a",
+  "authors": [
+    "Tiberiu Corbu <tiberiu.corbu@gmail.com>"
+  ],
+  "description": "A fullfeatured tag editor component",
+  "moduleType": [
+    "globals"
+  ],
+  "keywords": [
+    "UI",
+    "Tags",
+    "Input"
+  ],
+  "license": "MIT",
+  "homepage": "index.html",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

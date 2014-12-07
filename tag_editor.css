@@ -1,0 +1,61 @@
+.tag-editor {
+	height : auto;
+	min-height: 40px;
+}
+
+.tag-editor-input {
+    border: 0px solid transparent;
+    background: transparent;
+}
+
+.tag-editor-wrapper {
+    position: absolute; 
+}
+
+.tag-item-wrapper {
+  overflow : hidden;
+  height: 20px;
+  max-width:100%;
+  display: inline-block;
+  position: relative;
+}
+
+.tag-item-wrapper > div {
+	-webkit-transition: all .25s ease;
+	-moz-transition: all .25s ease;
+	transition: all .25s ease;
+	opacity: 1;
+    filter: alpha(opacity=1); /* For IE8 and earlier */
+}
+
+.editing .tag-item-wrapper.selected .tag-label {
+	visibility: hidden; 	
+}
+
+.tag-item-wrapper .tag-preffix-wrapper, .tag-item-wrapper .tag-suffix-wrapper{
+  width: 20px;
+  position: absolute;
+}
+
+.tag-item-wrapper .tag-suffix-wrapper {
+  top: 0px;
+  right: 0px;
+}
+
+.tag-item-wrapper .label-wrapper {
+  margin: 0 25px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.tag-label {
+   white-space : pre;
+}
+
+.tag-item-wrapper {
+    background: #F2F2F2;
+    margin-right: 3px;
+}
+.editing-tag {
+    background: transparent;
+}

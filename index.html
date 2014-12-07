@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<!--
+Copyright (c) 2014 by tiberiu.corbu
+-->
+<meta name="robots" content="noindex">
+<html>
+<head>
+ 
+  <link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+  <link href="tag_editor.css" rel="stylesheet" type="text/css" />
+  <meta charset="utf-8">
+  <title>Tag Editor - Workspace</title>
+</head>
+<body>
+  <div class="container">
+    <!-- TODO: find a good and lightwheight template -->
+    <div class="row">
+      <div class="col-md-12 col-xs-12">
+      <div class="form-control tag-editor relative-layer">
+          <div class="tags"></div>
+          <div class="overlay-layer">
+              <div class="tag-editor-wrapper">
+                  <input class="tag-editor-input" type="text">
+              </div>
+          </div>
+      </div><!-- .col-md-12 -->
+      </div><!-- .tag-editor -->
+    </div><!-- .row -->
+  </div>
+  <script src="http://code.jquery.com/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+  <script src="./caret_api.js"></script>
+  <script src="./tag_item.js"></script>
+  <script src="./tag_editor.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
