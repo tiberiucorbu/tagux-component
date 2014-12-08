@@ -1,0 +1,26 @@
+{
+   "capabilities":[
+      {
+         "browserName":"firefox",
+         "acceptSslCerts":true,
+         "javascriptEnabled":true,
+         "takesScreenshot":false,
+         "firefox_profile":"",
+         "browser-version":"27",
+         "platform":"LINUX",
+         "maxInstances":5,
+         "firefox_binary":"",
+         "cleanSession":true
+      }
+   ],
+   "configuration":{
+      "_comment":"Configuration for Node",
+      "cleanUpCycle":2000,
+      "timeout":30000,
+      "port":5555,
+      "host":"127.0.0.1",
+      "register":true,
+      "hubPort":4444,
+      "maxSessions":5
+   }
+}

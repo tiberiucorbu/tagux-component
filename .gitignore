@@ -1,0 +1,4 @@
+node_modules
+nightwatch.json~
+test_result/
+nohup.out

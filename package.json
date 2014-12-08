@@ -1,0 +1,9 @@
+{
+	"devDependencies": {
+		"nodeunit" : ">=v0.2.0",
+		"selenium-webdriver" : ">=2.44.0",
+		"nightwatch": ">=0.5.35",
+		"connect" : ">=0",
+		"serve-static" : ">=0"
+	}
+}
