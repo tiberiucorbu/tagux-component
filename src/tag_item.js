@@ -1,74 +1,102 @@
-var TagItem = (function(window, $) {
-	var TagItem = function(value, options) {
-		this.init();
-		this.setValue(value);
-		this.options = $.extend({}, TagItem.defaults, options);
-	};TagItem.defaults = {
+// ##################################################################################### Tag Editor Component
 
-	};
-	TagItem.prototype.init = function() {
-		this.createElements();
-		this.attachEventListeners();
-	};
+var TagItem = (function(window) {
 
-	TagItem.prototype.createElements = function() {
-		this.$el = $('<div class="tag-item-wrapper"> <div class="tag-preffix-wrapper"><span> preffix</span> </div> <div class="label-wrapper"> <span class="tag-label"></span> </div> <div class="tag-suffix-wrapper"> <span>suffix</span> </div> </div> ');
-	};
+    var TagItemUI = function() {
+        this.createDOMElements();
+    };
 
-	TagItem.prototype.attachEventListeners = function() {
-		this.$el.find('span.tag-label').on('click', $.proxy(this.onClick, this));
-	};
+    TagItemUI.prototype.createDOMElements = function() {
+        var wrapper = createElement(blockElement, 'item' + wrapperClassNameSufix);
+        var prefixWrapper = createElement(blockElement, 'preffix' + wrapperClassNameSufix);
+        var sufixWrapper = createElement(blockElement, 'suffix' + wrapperClassNameSufix);
+        var labelWrapper = createElement(blockElement, 'label' + wrapperClassNameSufix);
+        var label = createElement(textElement, 'label');
 
-	TagItem.prototype.onClick = function(event) {
-		if (this.options.labelClickCallback) {
-		    this.options.labelClickCallback(this);
-		}
-		//console.log('request edit');
-	};
+        append(wrapper, prefixWrapper);
+        append(wrapper, labelWrapper);
+        append(labelWrapper, label);
+        append(wrapper, sufixWrapper);
+        this.label = label;
+        this.wrapper = wrapper;
+        this.labelWrapper = labelWrapper;
+        this.sufixWrapper = sufixWrapper;
+        this.prefixWrapper = prefixWrapper;
+    };
 
-	TagItem.prototype.valueChange = function(changed, oldValue) {
-		// simulate how a suggestion would look like
+    var TagItem = function(value, options) {
+        this.options = copy({}, TagItem.defaults, options);
+        this.ui = new TagItemUI();
+        this.init();
+        this.setValue(value);
+    };
 
-		// TODO : trigger value change callbacks
-		//console.log('tag label changed' + this.value);
-	};
+    TagItem.defaults = {
 
-	TagItem.prototype.setValue = function(value) {
-		// TODO : provide enable/disable option for this value change check
-		var changed = value !== this.value;
-		var oldValue = this.value;
-		if (changed) {
-		    this.value = value;
-		    var label = this.label(value);
-		    this.$el.find('.tag-label').text(label).attr('title',label);
-		}
-		this.valueChange(changed, oldValue);
-	};
+    };
 
-	TagItem.prototype.getValue = function() {
-		return this.value;
-	};
+    TagItem.prototype.init = function() {
+        this.ui.createDOMElements();
+        this.attachEventListeners();
+    };
 
-	TagItem.prototype.setSelected = function(selected) {
-		this.selected = selected;
-		if (selected) {
-		    this.$el.addClass('selected');
-		} else {
-		    this.$el.removeClass('selected');
-		}
-	};
+    TagItem.prototype.attachEventListeners = function() {
+        this.ui.label.onclick = delegate(this.onClick, this);
+    };
 
-	TagItem.prototype.destroy = function() {
-		this.$el.off();
-		this.$el.remove();
-		delete this;
-	};
+    TagItem.prototype.onClick = function(event) {
+        if (this.options.labelClickCallback) {
+            this.options.labelClickCallback(this);
+        }
+        log('item requested an edit');
+        stopEventPropagation(event);
+        return false;
+    };
 
-	TagItem.prototype.label = function() {
+    TagItem.prototype.valueChange = function(changed, oldValue) {
+        // simulate how a suggestion would look like
 
-		// TODO : add a decorator callback here exposed from options
-		return '' + this.value;
-	};
-	
-	return TagItem;
-})(window, jQuery);
+        // TODO : trigger value change callbacks
+        //console.log('tag label changed' + this.value);
+    };
+
+    TagItem.prototype.setValue = function(value) {
+        // TODO : provide enable/disable option for this value change check
+        var changed = value !== this.value;
+        var oldValue = this.value;
+        if (changed) {
+            this.value = value;
+            var label = this.label(value);
+            this.ui.label.innerHTML = label;
+            this.ui.label.title = label;
+        }
+        this.valueChange(changed, oldValue);
+    };
+
+    TagItem.prototype.getValue = function() {
+        return this.value;
+    };
+
+    TagItem.prototype.setSelected = function(selected) {
+        this.selected = selected;
+        if (selected) {
+            addClass(this.ui.wrapper, 'selected');
+        } else {
+            removeClass(this.ui.wrapper, 'selected');
+        }
+    };
+
+    TagItem.prototype.destroy = function() {
+        if (this.ui.wrapper.parentNode && typeof this.ui.wrapper.parentNode.removeChild !== 'undefined')
+            this.ui.wrapper.parentNode.removeChild(this.ui.wrapper);
+
+    };
+
+    TagItem.prototype.label = function() {
+
+        // TODO : add a decorator callback here exposed from options
+        return '' + this.value;
+    };
+
+    return TagItem;
+})(window);

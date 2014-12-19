@@ -3,6 +3,11 @@
 	min-height: 40px;
 }
 
+.tag-editor .tag-overlay-layer {
+	height : 0px;
+	
+}
+
 .tag-editor-input {
     border: 0px solid transparent;
     background: transparent;
@@ -16,7 +21,7 @@
   overflow : hidden;
   height: 20px;
   max-width:100%;
-  display: inline-block;
+  float: left;
   position: relative;
 }
 
@@ -25,16 +30,18 @@
 	-moz-transition: all .25s ease;
 	transition: all .25s ease;
 	opacity: 1;
-    filter: alpha(opacity=1); /* For IE8 and earlier */
+    filter: alpha(opacity=100); /* For IE8 and earlier */
 }
 
 .editing .tag-item-wrapper.selected .tag-label {
-	visibility: hidden; 	
+	visibility: hidden;
+	height: 0px; 	
 }
 
 .tag-item-wrapper .tag-preffix-wrapper, .tag-item-wrapper .tag-suffix-wrapper{
   width: 20px;
   position: absolute;
+  display : none;
 }
 
 .tag-item-wrapper .tag-suffix-wrapper {
@@ -42,8 +49,8 @@
   right: 0px;
 }
 
-.tag-item-wrapper .label-wrapper {
-  margin: 0 25px;
+.tag-item-wrapper .tag-label-wrapper {
+  -margin: 0 25px;
   text-overflow: ellipsis;
   overflow: hidden;
 }
@@ -53,9 +60,9 @@
 }
 
 .tag-item-wrapper {
+    
     background: #F2F2F2;
-    margin-right: 3px;
-}
-.editing-tag {
-    background: transparent;
+    padding-right: 3px;
+    
+   	
 }

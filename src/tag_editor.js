@@ -1,57 +1,86 @@
-var TagEditor = function(options) {
-    this.options = $.extend({}, TagEditor.defaults, options);
-    this.currentTag = -1;
+// ##################################################################################### Tag Editor Component
+
+
+var TagEditorInput = function(wrapper){
+    
+    this.init(el);
+};
+
+
+TagEditorInput.prototype.attachEventListeners = function() {
+    var input = this.ui.input;
+    addEventListener(input, 'keyup', around(this, this.onKeyUpEvents));
+    addEventListener(input, 'keypress', around(this, this.onKeyPressEvents));
+    addEventListener(input, 'focus', around(this, this.onFocusEvent));
+    addEventListener(input, 'blur', around(this, this.onBlurEvent));
+};
+
+var TagEditor = function(el, options) {
+
+    this.options = copy({}, TagEditor.defaults, options);
+    this.selectedIdx = -1;
     this.tags = [];
-    this.init();
+    this.init(el);
+
 };
 
 TagEditor.defaults = {
-    wrapperElementSelector : '.tag-editor',
-    tagItemOptions : {
-        labelClickCallback : null
-    }
+   
 };
 
-TagEditor.prototype.init = function() {
-    this.createInstanceOptions();
-    this.wrapperEl = $(this.options.wrapperEl);
-    this.inputEl = this.wrapperEl.find('input.tag-editor-input').eq(0);
-    this.inputWrapper = this.wrapperEl.find('div.tag-editor-wrapper').eq(0);
-    this.tagsWrapper = this.wrapperEl.find('div.tags').eq(0);
+TagEditor.prototype.init = function(el) {
+
+    this.ui = new TagEditorUI(el);
     this.attachEventListeners();
+
 };
 
-TagEditor.prototype.setCurrentTag = function(currentTag) {
-    this.currentTag = currentTag;
-    $('.debug').text('current tag ids is ' + this.currentTag);
+// model
+
+// selection
+
+TagEditor.prototype.getSelectedIdx = function() {
+    return this.getIndexBoundsValue(this.selectedIdx);
+};
+
+TagEditor.prototype.findPreviousTag = function() {
+    // woohoo js doesn't complain of index out of bounds '
+    return this.tags[this.getSelectedIdx() - 1];
+};
+
+TagEditor.prototype.setCurrentTag = function(idx) {
+    this.setSelectedIdx(idx);
     var size = this.tags.length;
     for (var i = 0; i < size; i++) {
-        if (i !== currentTag) {
+        if (i !== idx) {
             this.tags[i].setSelected(false);
         }
     }
-    var currentTagElement = this.getCurrentTag();
-    if (currentTagElement) {
-        currentTagElement.setSelected(true);
+    var selectedTagElement = this.getCurrentTag();
+    if (selectedTagElement) {
+        selectedTagElement.setSelected(true);
     }
-};
-TagEditor.prototype.createInstanceOptions = function() {
-    var tagItemOptions = this.options.tagItemOptions || {};
-    if (tagItemOptions) {
-        tagItemOptions.labelClickCallback = $.proxy(this.onTagClickEvent, this);
-    }
-    this.options.tagItemOptions = tagItemOptions;
 };
 
 TagEditor.prototype.onTagClickEvent = function(tag) {
     this.setCurrentTagEl(tag);
-    this.syncInputWidthTag();
+    this.syncInputWidthTag(tag);
 };
-TagEditor.prototype.syncInputWidthTag = function() {
-    var tag = this.getCurrentTag();
-    this.inputEl.val(tag.getValue());
-    this.sizeInput();
-    this.positionInput();
+TagEditor.prototype.syncInputWidthTag = function(tag) {
+    var _tag = tag || this.getCurrentTag();
+    this.ui.input.value = _tag.getValue() || '';
+    this.sizeInput(_tag);
+    this.positionInput(_tag);
+    this.ui.input.focus();
+};
+
+TagEditor.prototype.isIndexOutOfBound = function() {
+    return this.getIndexBoundsValue(this.getSelectedIdx()) !== this.getSelectedIdx();
+};
+
+TagEditor.prototype.getIndexBoundsValue = function(idx) {
+    var size = this.tags.length;
+    return idx < 0 ? 0 : idx > size ? size - 1 : idx;
 };
 
 TagEditor.prototype.setCurrentTagEl = function(tag) {
@@ -66,12 +95,8 @@ TagEditor.prototype.setCurrentTagEl = function(tag) {
     }
 };
 
-TagEditor.prototype.findPreviousTag = function() {
-    // woohoo js doesn't complain of index out of bounds '
-    return this.tags[this.currentTag - 1];
-};
 TagEditor.prototype.getCurrentTag = function() {
-    return this.tags[this.currentTag];
+    return this.tags[this.getSelectedIdx()];
 };
 
 TagEditor.prototype.isSubmitKey = function(code) {
@@ -86,31 +111,43 @@ TagEditor.prototype.isSubmitKey = function(code) {
 TagEditor.prototype.removeCurrent = function() {
     var tag = this.getCurrentTag();
     tag.destroy();
-    this.tags.splice(this.currentTag, 1);
-    this.setCurrentTag(this.currentTag - 1);
+    this.tags.splice(this.getSelectedIdx(), 1);
+    this.setCurrentTag(this.getSelectedIdx() - 1);
 };
 
 TagEditor.prototype.insertTagAfter = function(tag, idx) {
-    var lastIndex = this.tagsWrapper.children().size() - 1;
-    var tagElements = this.tagsWrapper.children();
-    if (idx > lastIndex) {
-        this.tagsWrapper.append(tag.$el);
+    var ui = tag.ui;
+    var tagsWrapper = this.ui.tags;
+    var size = tagsWrapper.childNodes.length;
+    var tagElements = tagsWrapper.childNodes;
+    var idxResult = -1;
+    if (idx >= size - 1) {
+        tagsWrapper.appendChild(ui.wrapper);
         this.tags.push(tag);
+        idxResult = size;
     } else if (idx < 0) {
-        this.tagsWrapper.prepend(tag.$el);
+        if (tagsWrapper.firstChild) {
+            tagsWrapper.insertBefore(ui.wrapper, tagsWrapper.firstChild);
+        } else {
+            tagsWrapper.appendChild(ui.wrapper);
+        }
         this.tags.unshift(tag);
+        idxResult = 0;
     } else {
-        tag.$el.insertAfter(tagElements.eq(idx));
+        tagsWrapper.insertBefore(ui.wrapper, tagElements[idx + 1]);
         this.tags.splice(idx + 1, 0, tag);
+        result = idx + 1;
     }
+    return idxResult;
+
 };
 
 TagEditor.prototype.createNextTag = function(nextTo) {
     var tag = this.createTagItem();
     if (nextTo) {
         // TODO Treat left to right text.
-        this.insertTagAfter(tag, this.currentTag);
-        this.setCurrentTag(this.currentTag + 1);
+        this.insertTagAfter(tag, this.getSelectedIdx());
+        this.setCurrentTag(this.getSelectedIdx() + 1);
     } else {
         var idx = this.appendTag(tag);
         this.setCurrentTag(idx);
@@ -120,11 +157,11 @@ TagEditor.prototype.createNextTag = function(nextTo) {
 };
 
 TagEditor.prototype.selectPrev = function() {
-    this.selectNth(this.currentTag - 1);
+    this.selectNth(this.getSelectedIdx() - 1);
 };
 
 TagEditor.prototype.selectNext = function() {
-    this.selectNth(this.currentTag + 1);
+    this.selectNth(this.getSelectedIdx() + 1);
 };
 
 TagEditor.prototype.selectNth = function(index) {
@@ -135,74 +172,74 @@ TagEditor.prototype.selectNth = function(index) {
 };
 
 TagEditor.prototype.handleSpecialInputKeyPress = function(event) {
+
     var result = {
-        regularKey : true
+        regularKey : true,
+        preventEvent : false
     };
 
-    var code = event.which || event.keyCode;
+    var code = event.keyCode || event.which;
+    log(code);
     // tab
     var tab = code === 9;
     if (tab) {
 
         if (event.shiftKey) {
-            var firstSelected = (this.currentTag === 0);
+            var firstSelected = (this.getSelectedIdx() === 0);
             if (!firstSelected) {
                 this.selectPrev();
-                event.preventDefault();
+                //event.preventDefault();
                 //this.inputEl.focus();
             }
         } else {
-            var lastSelected = (this.currentTag === this.tags.length - 1);
+            var lastSelected = (this.getSelectedIdx() === this.tags.length - 1);
             if (!lastSelected) {
                 this.selectNext();
-                event.preventDefault();
+                //event.preventDefault();
             }
         }
         result.regularKey = false;
     } else if (code === 39) {
         //right
-        var caret = CaretAPI.getCaretPosition(this.inputEl[0]);
-        var gotoNext = caret.end === this.inputEl.val().length;
+        var caret = CaretAPI.getCaretPosition(this.ui.input);
+        var gotoNext = caret.end === this.ui.input.value.length;
         if (gotoNext) {
-            
             this.selectNext();
-            event.preventDefault();
-            CaretAPI.setCaretPosition(this.inputEl[0], 0);
-            
+            //event.preventDefault();
+            CaretAPI.setCaretPosition(this.ui.input, 0);
+
         }
     } else if (code == 37) {
         //left
-        var caret = CaretAPI.getCaretPosition(this.inputEl[0]);
+        var caret = CaretAPI.getCaretPosition(this.ui.input);
         var gotoPrev = caret.start === 0;
         if (gotoPrev) {
             this.selectPrev();
-            event.preventDefault();
-            CaretAPI.setCaretPosition(this.inputEl[0], this.inputEl.val().length*2);
+            //event.preventDefault();
+            CaretAPI.setCaretPosition(this.ui.input, this.ui.input.value.length * 2);
         }
     }
     return result;
 };
 
 TagEditor.prototype.handleSpecialInputKeyUp = function(event) {
+
     var result = {
-        regularKey : true
+        regularKey : true,
+        preventEvent : false
     };
 
-    var code = event.which || event.keyCode;
-
+    var code = event.keyCode || event.which;
+    log(code);
     if (this.isSubmitKey(code)) {
         var comma = code === 188;
         var discarded = this.finishEditingTag(comma);
-        //ultra special case for comma
         if (discarded && comma) {
-            var tag = this.findPreviousTag();
-            if (tag) {
-                this.setCurrentTagEl(tag);
-                this.syncInputWidthTag();
-            }
+            this.syncInputWidthTag();
+        } else {
+            this.createNextTag(comma);
+            result.preventEvent = true;
         }
-        this.createNextTag(comma);
-        event.preventDefault();
         result.regularKey = false;
     } else if (code === 9) {
         result.regularKey = false;
@@ -213,25 +250,43 @@ TagEditor.prototype.handleSpecialInputKeyUp = function(event) {
 
 TagEditor.prototype.finishEditingTag = function() {
     var discarded = true;
-    var value = this.inputEl.val();
-    if ($.trim(value).length > 0 && $.trim(value) !== ',') {
+    var value = this.ui.input.value;
+    if (trim(value).length > 0 && trim(value) !== ',') {
         var discarded = false;
     } else {
         this.removeCurrent();
     }
-    this.inputEl.val('');
+    this.ui.input.value = '';
+    log("finishEditingTag");
     return discarded;
 };
 
-TagEditor.prototype.positionInput = function() {
-    var tag = this.getCurrentTag();
-    if (tag) {
-        var pos = tag.$el.position();
-        this.wrapperEl.addClass('editing');
-        this.inputWrapper.css({
-            top : (pos.top - 1) + "px",
-            left : (pos.left + 24) + "px"
-        });
+TagEditor.prototype.setSelectedIdx = function(idx) {
+    // position outside the viewport
+    this.selectedIdx = this.getIndexBoundsValue(idx);
+};
+
+TagEditor.prototype.createTagItem = function(value) {
+    return new TagItem(value, {
+        labelClickCallback : around(this, this.onTagClickEvent)
+    });
+};
+
+TagEditor.prototype.appendTag = function(tag) {
+    return this.insertTagAfter(tag, this.tags.length);
+};
+
+TagEditor.prototype.positionInput = function(tag) {
+    var _tag = tag || this.getCurrentTag();
+    if (_tag) {
+        var pos = {
+            top : _tag.ui.wrapper.offsetTop,
+            left : _tag.ui.wrapper.offsetLeft
+        };
+        addClass(this.ui.wrapper, 'editing');
+        this.ui.editWrapper.style.top = (pos.top - 1) + "px";
+        this.ui.editWrapper.style.left = (pos.left + 1) + "px";
+        this.ui.editWrapper.style.display = 'block';
     } else {
         this.moveInputOut();
     }
@@ -239,91 +294,99 @@ TagEditor.prototype.positionInput = function() {
 
 TagEditor.prototype.moveInputOut = function() {
     // position outside the viewport
-    this.wrapperEl.removeClass('editing');
-    
-    this.inputWrapper.css({
-        top : '-100px'
-    });
-
-};
-
-TagEditor.prototype.createTagItem = function(value) {
-    return new TagItem(value, this.options.tagItemOptions);
-};
-
-TagEditor.prototype.appendTag = function(tag) {
-    var size = this.tags.length;
-    this.tagsWrapper.append(tag.$el);
-    return this.tags.push(tag) - 1;
-};
-
-TagEditor.prototype.isIndexOutOfBound = function() {
-    return this.getIndexBoundsValue(this.currentTag) !== this.currentTag;
-};
-
-TagEditor.prototype.getIndexBoundsValue = function(idx) {
-    var size = this.tags.length;
-    return this.currentTag < 0 ? 0 : idx > size ? size - 1 : idx;
-};
-
-TagEditor.prototype.onFocusEvent = function(event) {
-    if (this.isIndexOutOfBound() || !this.tags.length) {
-        this.createNextTag(false);
-    }
-    this.syncInputWidthTag();
+    removeClass(this.ui.wrapper, 'editing');
+    this.ui.editWrapper.style.display = 'none';
 };
 
 TagEditor.prototype.syncInput = function() {
-    var value = this.inputEl.val();
+    var value = this.ui.input.value;
     this.setCurrentTagValue(value);
     this.sizeInput();
     this.positionInput();
+    return false;
 };
 
-TagEditor.prototype.onKeyPressEvents = function(event) {
-    var specialKeysResult = this.handleSpecialInputKeyPress(event);
-    if (specialKeysResult.regularKey) {
-        this.syncInput();
+TagEditor.prototype.onWrapperClick = function(event) {
+
+    log('wrapper click');
+    if (!this.tags.length) {
+        this.createNextTag(false);
     }
+    this.syncInputWidthTag();
+
+    this.ui.input.focus();
+    var that = this;
 };
 
-TagEditor.prototype.onKeyUpEvents = function(event) {
-    var specialKeysResult = this.handleSpecialInputKeyUp(event);
-    if (specialKeysResult.regularKey) {
-        this.syncInput();
-    }
-};
-
-TagEditor.prototype.onBlurEvent = function() {
-    this.finishEditingTag();
-    this.moveInputOut();
-
-};
-
-TagEditor.prototype.onWrapperClick = function() {
-    this.inputEl.focus();
-};
-
-TagEditor.prototype.attachEventListeners = function() {
-    this.wrapperEl = $(this.options.wrapperEl);
-    this.wrapperEl.on('click', $.proxy(this.onWrapperClick, this));
-    this.inputEl.on('keyup', $.proxy(this.onKeyUpEvents, this));
-    this.inputEl.on('keypress', $.proxy(this.onKeyPressEvents, this));
-    this.inputEl.on('focus', $.proxy(this.onFocusEvent, this));
-    this.inputEl.on('blur', $.proxy(this.onBlurEvent, this));
-
-};
-
-TagEditor.prototype.sizeInput = function() {
-    var currentTag = this.getCurrentTag();
+TagEditor.prototype.sizeInput = function(tag) {
+    var _tag = tag || this.getCurrentTag();
     var width = 0;
-    if (currentTag) {
-        width = currentTag.$el.find('.label-wrapper').width()+10;
-
+    if (_tag) {
+        width = _tag.ui.label.offsetWidth + 10;
     }
-    this.inputEl.width(width);
+    this.ui.input.style.width = width + 'px';
 };
 
 TagEditor.prototype.setCurrentTagValue = function(value) {
     this.getCurrentTag().setValue(value);
+};
+
+// ################################################### events
+
+TagEditor.prototype.attachEventListeners = function() {
+    var wrapper = this.ui.wrapper;
+    var input = this.ui.input;
+    var that = this;
+    addEventListener(wrapper, 'click', around(this, this.onWrapperClick));
+    addEventListener(input, 'keyup', around(this, this.onKeyUpEvents));
+    addEventListener(input, 'keypress', around(this, this.onKeyPressEvents));
+    addEventListener(input, 'focus', around(this, this.onFocusEvent));
+    addEventListener(input, 'blur', around(this, this.onBlurEvent));
+};
+
+TagEditor.prototype.onBlurEvent = function(event) {
+    log('blur event triggered', event);
+    this.finishEditingTag();
+    this.moveInputOut();
+    stopEventPropagation(event);
+};
+
+TagEditor.prototype.onKeyPressEvents = function(event) {
+    log('key press event triggered', event);
+    if (this.tags.length === 0) {
+        return false;
+    }
+    var specialKeysResult = this.handleSpecialInputKeyPress(event);
+    if (specialKeysResult.regularKey) {
+        this.syncInput();
+    }
+    if (specialKeysResult.preventEvent && event.preventDefault) {
+        event.preventDefault();
+    }
+    return !specialKeysResult.preventEvent;
+};
+
+TagEditor.prototype.onKeyUpEvents = function(event) {
+    log('key up event triggered', event);
+    if (this.tags.length === 0) {
+        return false;
+    }
+    var specialKeysResult = this.handleSpecialInputKeyUp(event);
+    if (specialKeysResult.regularKey) {
+        this.syncInput();
+    }
+
+    if (specialKeysResult.preventEvent && event.preventDefault) {
+        event.preventDefault();
+    }
+    return !specialKeysResult.preventEvent;
+
+};
+
+TagEditor.prototype.onFocusEvent = function(event) {
+    log('focus event triggered', event);
+    if (this.isIndexOutOfBound() || this.tags.length === 0) {
+        this.createNextTag(false);
+    }
+    this.syncInputWidthTag();
 };

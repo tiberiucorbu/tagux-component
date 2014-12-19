@@ -1,3 +1,4 @@
+ 
 var CaretAPI = {
     /**
     * Author :   kd7 (http://stackoverflow.com/users/7280/kd7)
@@ -8,13 +9,17 @@ var CaretAPI = {
         if (elem != null) {
             if (elem.createTextRange) {
                 var range = elem.createTextRange();
-                range.move('character', caretPos);
+                range.moveStart('character', caretPos.start);
+                var text = range.text;
+                range.moveEnd('character', 0);
+                var endPos = caretPos.end - (text.length+caretPos.start);
+                range.moveEnd('character', endPos);
                 range.select();
             } else if (elem.selectionStart) {
-                elem.setSelectionRange(caretPos, caretPos);
+                elem.setSelectionRange(caretPos.start, caretPos.end);
             }
         }
-    },    
+    },      
     getCaretPosition : function(el) {
         var start = 0, end = 0, normalizedValue, textInputRange, len, endRange;
         // Firefox

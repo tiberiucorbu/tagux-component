@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<!--
+Copyright (c) 2014 by tiberiu.corbu 
+
+Released under the MIT license: http://jsbin.mit-license.org
+-->
+<meta name="robots" content="noindex">
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>JS Bin</title>
+  <script src="../caret_api.js">
+   
+    
+  </script>
+</head>
+<body>
+  <p>focus the input to run the tests</p>
+  <input id="myNeatInput" />
+  <br />
+  <pre id="debug"></pre>
+<script id="jsbin-javascript">
+var input = document.getElementById('myNeatInput');
+var debug = document.getElementById('debug');
+var currentProbe = 0;
+
+var probes = [
+  {start: 0, end: 1, value: 'Start = 0, End = 1'},
+  {start: 1, end: 1, value: 'Start = 1, End = 1'},
+  {start: 0, end: 0, value: 'Start = End = 0'},
+  {start: 2, end: 2, value: 'Start = End'},
+  {start: 4, end: 2, value: 'Start > End'},
+  {start: 2, end: 4, value: 'Start < End'},
+  {start: 100, end: 100, value: 'Start = End, Last'}
+  
+];
+
+var hasNextProbe = function(){
+  return currentProbe < probes.length;  
+};
+
+
+var nextProbe = function(){
+  var probe =  probes[currentProbe];
+  currentProbe++;
+  return probe;
+};
+
+var probeToString = function(probe){
+  var buff = '';
+  buff='start : '+probe.start
+    +', '
+    +'end : '+probe.end;
+    +'\n';
+  return buff;
+};
+
+var runProbe = function(probe){
+  debug.innerHTML = 'in  :' + probeToString(probe)+'<br />';
+  input.value = probe.value;
+  CaretAPI.setCaretPosition(input, probe);
+  var pos = CaretAPI.getCaretPosition(input, probe);
+  debug.innerHTML += 'out :' + probeToString(pos)+'\n';
+};
+
+var run = function(){
+  if (hasNextProbe()){
+    var probe = nextProbe();
+    runProbe(probe);
+    setTimeout(run, 3000);
+  }
+};
+input.focus();
+run();
+
+</script>
+</body>
+</html>

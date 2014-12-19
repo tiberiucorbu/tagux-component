@@ -3,16 +3,16 @@
   "output_folder" : "test_result/int/reports",
   
   "selenium" : {
-    "start_process" : true,
+    "start_process" : false,
     "server_path" : "/opt/selenium/selenium-server-standalone-2.44.0.jar",
     "log_path" : "test_result/int/logs",
     "host" : "127.0.0.1",
-    "port" : 4444
+    "port" : 5555
   },
   "test_settings" : {
     "default" : {
       "launch_url" : "127.0.0.1",
-      "selenium_port"  : 4444,
+      "selenium_port"  : 5555,
       "selenium_host"  : "127.0.0.1",
       "silent": true,
       "screenshots" : {

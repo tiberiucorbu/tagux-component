@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<!--
+Copyright (c) 2014 by tiberiu.corbu
+-->
+<meta name="robots" content="noindex">
+<html>
+<head>
+ 
+  <link href="lib/bootstrap.min.css" rel="stylesheet" type="text/css" />
+  <link href="../tag_editor.css" rel="stylesheet" type="text/css" />
+  <meta charset="utf-8">
+  
+  <title>Tag Editor - Workspace</title>
+
+  
+  
+</head>
+<body>
+  <div class="container">
+      
+      <div class="row">
+        <div class="col-md-12">
+          <h2>Tag editor - Example</h2>
+        </div><!-- .col-md-12 -->
+      </div><!-- .row-->
+      <div class="row">
+        <div class="col-md-12">
+           <h2>Decorate input</h2>
+         </div> <!-- .col-md-12 -->
+      </div><!-- .row -->
+      <!-- input -->
+      <div class="row">
+        <div class="col-md-12">
+            <input name="tagEditorInput" type="text" class="form-control a-custom-class" id="tag-editor-input" />
+         </div> <!-- .col-md-12 -->
+      </div><!-- .row -->
+      <!-- other element -->
+      <div class="row">
+        <div class="col-md-12">
+           <h2>Decorate a block/webpage chunk element (div, span)</h2>
+         </div> <!-- .col-md-12 -->
+      </div><!-- .row -->
+      <div class="row">
+        <div class="col-md-12">
+            <div id="tag-editor-block" class="form-control a-custom-class">
+                
+            </div>
+         </div> <!-- .col-md-12 -->
+      </div><!-- .row -->
+      <div class="row">
+        <div class="col-md-12">
+            <button id="clear-console">Clear</button>
+            <pre id="debug">
+                
+            </pre>
+         </div> <!-- .col-md-12 -->
+      </div><!-- .row -->
+  </div><!-- .container -->
+  <script src="../commons.js"></script>
+  <script src="../caret_api.js"></script>
+  <script src="../cursor-array.js"></script>
+  <script src="../tag_item.js"></script>
+  <script src="../tag-editor-ui.js"></script>
+  <script src="../tag_editor.js"></script>
+  <script src="./tag_editor.example.js"></script>
+</body>
+</html>
