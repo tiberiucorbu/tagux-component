@@ -10,18 +10,22 @@ var TagItem = (function(window) {
         var wrapper = createElement(blockElement, 'item' + wrapperClassNameSufix);
         var prefixWrapper = createElement(blockElement, 'preffix' + wrapperClassNameSufix);
         var sufixWrapper = createElement(blockElement, 'suffix' + wrapperClassNameSufix);
+        var deleteBtn = createElement(textElement, 'remove  glyphicon glyphicon-remove');
         var labelWrapper = createElement(blockElement, 'label' + wrapperClassNameSufix);
         var label = createElement(textElement, 'label');
 
         append(wrapper, prefixWrapper);
         append(wrapper, labelWrapper);
         append(labelWrapper, label);
+
+        append(sufixWrapper, deleteBtn);
         append(wrapper, sufixWrapper);
         this.label = label;
         this.wrapper = wrapper;
         this.labelWrapper = labelWrapper;
         this.sufixWrapper = sufixWrapper;
         this.prefixWrapper = prefixWrapper;
+        this.deleteBtn = deleteBtn;
     };
 
     var TagItem = function(value, options) {
@@ -53,11 +57,10 @@ var TagItem = (function(window) {
         return false;
     };
 
-    TagItem.prototype.valueChange = function(changed, oldValue) {
-        // simulate how a suggestion would look like
-
-        // TODO : trigger value change callbacks
-        //console.log('tag label changed' + this.value);
+    TagItem.prototype.valueChange = function(changed, value, oldValue) {
+        if (this.options.valueChangeCallback) {
+            this.options.valueChangeCallback(this, value, oldValue);
+        }
     };
 
     TagItem.prototype.setValue = function(value) {
@@ -70,7 +73,7 @@ var TagItem = (function(window) {
             this.ui.label.innerHTML = label;
             this.ui.label.title = label;
         }
-        this.valueChange(changed, oldValue);
+        this.valueChange(changed, value, oldValue);
     };
 
     TagItem.prototype.getValue = function() {
@@ -93,9 +96,12 @@ var TagItem = (function(window) {
     };
 
     TagItem.prototype.label = function() {
-
         // TODO : add a decorator callback here exposed from options
-        return '' + this.value;
+        if (this.value && this.value.text) {
+            return this.value.text;
+        } else {
+            return '' + this.value;
+        }
     };
 
     return TagItem;

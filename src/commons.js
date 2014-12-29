@@ -66,35 +66,31 @@ function addEventListener(el, eventName, handler) {
     }
 }
 
-function stopEventPropagation(e)
-{
+function stopEventPropagation(e) {
     log('stoping event propagation');
     if (!e)
-      e = window.event;
+        e = window.event;
 
     //IE9 & Other Browsers
     if (e.stopPropagation) {
-      e.stopPropagation();
+        e.stopPropagation();
     }
     //IE8 and Lower
     else {
-      e.cancelBubble = true;
+        e.cancelBubble = true;
     }
-    
+
 }
 
-
-function triggerEvent(el, eventName){
+function triggerEvent(el, eventName) {
     if (document.createEvent) {
-      var event = document.createEvent('HTMLEvents');
-      event.initEvent(eventName, true, false);
-      el.dispatchEvent(event);
+        var event = document.createEvent('HTMLEvents');
+        event.initEvent(eventName, true, false);
+        el.dispatchEvent(event);
     } else {
-      el.fireEvent('on'+eventName);
+        el.fireEvent('on' + eventName);
     }
 }
-
-
 
 // ##################################################################################### Debug methods
 var log = function() {
@@ -162,25 +158,34 @@ var delegate = function(fn, ctx) {
 
 };
 
-var around = function(ctx, fn, prefn, postfn) {
+var around = function(ctx, fn, prefn, postfn, extraArg) {
     return function(a, b, c) {
-        var callerArgs = copy([a, b, c], arguments);
-        var stop = prefn ? prefn.call(ctx, fn, callerArgs):false;
-        var result ;
-        if  (!stop){
+        var callerArgs = reduce([extraArg, a, b, c]);
+        var stop = prefn ? prefn.call(ctx, fn, callerArgs) : false;
+        var result;
+        if (!stop) {
             var fnResult = fn.apply(ctx, callerArgs);
-            result = postfn ? postfn.call(ctx, fn, callerArgs, fnResult):fnResult;
+            result = postfn ? postfn.call(ctx, fn, callerArgs, fnResult) : fnResult;
         }
         return result;
     };
 
 };
 
+var reduce = function(arr) {
+    var retVal = [];
+    var size = arr.length;
+    for (var i = 0; i < size; i++) {
+        if (arr[i]) {
+            retVal.push(arr[i]);
+        }
+    }
+    return retVal;
+};
 
-
-var inherit = function(target, source){
+var inherit = function(target, source) {
     copy(target, source);
-    for(var x in source.prototype){
+    for (var x in source.prototype) {
         target.prototype[x] = source.prototype[x];
     }
 };
@@ -190,29 +195,29 @@ var isType = function(obj, type) {
     var match = /^\[object (.*)\]$/g.exec(objTypeRaw);
     var result = false;
     if (match) {
-        var typeString = type + '';
-        result = (typeString === match[1]);
+        var typeString = (type + '').toLowerCase();
+        result = (typeString === match[1].toLowerCase());
     }
     return result;
 };
 
-
 // ################################################### polyfils
 // Object create
-if (typeof Object.create != 'function') {
-  Object.create = (function() {
-    var Object = function() {};
-    return function (prototype) {
-      if (arguments.length > 1) {
-        throw Error('Second argument not supported');
-      }
-      if (typeof prototype != 'object') {
-        throw TypeError('Argument must be an object');
-      }
-      Object.prototype = prototype;
-      var result = new Object();
-      Object.prototype = null;
-      return result;
-    };
-  })();
+if ( typeof Object.create != 'function') {
+    Object.create = (function() {
+        var Object = function() {
+        };
+        return function(prototype) {
+            if (arguments.length > 1) {
+                throw Error('Second argument not supported');
+            }
+            if ( typeof prototype != 'object') {
+                throw TypeError('Argument must be an object');
+            }
+            Object.prototype = prototype;
+            var result = new Object();
+            Object.prototype = null;
+            return result;
+        };
+    })();
 }

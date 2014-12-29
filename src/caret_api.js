@@ -1,21 +1,40 @@
- 
+var end = 'end', start = 'start';
 var CaretAPI = {
+    translatePostionArg : function(pos, text){
+        var size = text.length;
+        var retVal = pos;
+        if (isType(pos, 'string')){
+            if (pos === end){
+                retVal = {start: size, end: size};
+            } else if (pos === start) {
+                retVal = {start : 0, end: 0};
+            }
+        }
+        return retVal;
+    },
+    
     /**
     * Author :   kd7 (http://stackoverflow.com/users/7280/kd7)
     * Original : http://stackoverflow.com/a/512542/2406376 
     */
     
-    setCaretPosition : function(elem, caretPos) {
+    setCaretPosition : function(elem, arg) {
+        
         if (elem != null) {
+            
+            
             if (elem.createTextRange) {
+                
                 var range = elem.createTextRange();
-                range.moveStart('character', caretPos.start);
                 var text = range.text;
+                var caretPos = CaretAPI.translatePostionArg(arg, text);
+                range.moveStart('character', caretPos.start);
                 range.moveEnd('character', 0);
                 var endPos = caretPos.end - (text.length+caretPos.start);
                 range.moveEnd('character', endPos);
                 range.select();
             } else if (elem.selectionStart) {
+                var caretPos =  CaretAPI.translatePostionArg(arg, elem.value);
                 elem.setSelectionRange(caretPos.start, caretPos.end);
             }
         }
