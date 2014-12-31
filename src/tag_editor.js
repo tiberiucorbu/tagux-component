@@ -237,7 +237,7 @@ TagEditor.prototype.handleSpecialInputKeyUp = function(event) {
         log('user pressed left');
         var caret = CaretAPI.getCaretPosition(this.ui.input);
         var gotoPrev = caret.start === 0;
-         var firstSelected = (this.getSelectedIdx() === 0);
+        var firstSelected = (this.getSelectedIdx() === 0);
         if (gotoPrev && !firstSelected) {
             this.selectPrev();
             //event.preventDefault();
