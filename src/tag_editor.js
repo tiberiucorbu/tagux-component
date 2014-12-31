@@ -278,9 +278,9 @@ TagEditor.prototype.createTagItem = function(value) {
 
 TagEditor.prototype.onTagValueChange = function(tag) {
     this.ui.sugWrapper.style.display = 'none';
-    
+
     this.ui.sugWrapper.innerHTML = '';
-    
+
     console.log('listener received the value', tag.value);
     if (this.sugestionsFetchTimer) {
         window.clearTimeout(this.sugestionsFetchTimer);

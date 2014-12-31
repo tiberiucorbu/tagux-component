@@ -97,12 +97,16 @@ var TagItem = (function(window) {
 
     };
 
-    TagItem.prototype.label = function() {
+    TagItem.prototype.label = function(value) {
         // TODO : add a decorator callback here exposed from options
-        if (this.value && this.value.text) {
-            return this.value.text;
+        if (value && value.text) {
+            return value.text;
         } else {
-            return '' + this.value;
+            if(value){
+                return '' + value;
+            } else {
+                return '';
+            }
         }
     };
 
