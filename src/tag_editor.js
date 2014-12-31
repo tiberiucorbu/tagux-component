@@ -52,15 +52,19 @@ TagEditor.prototype.setCurrentTag = function(idx) {
 
 TagEditor.prototype.onTagClickEvent = function(tag) {
     this.setCurrentTagEl(tag);
-    this.syncInputWidthTag(tag);
+    this.syncInputWidthTag(tag, end);
+
 };
 
-TagEditor.prototype.syncInputWidthTag = function(tag) {
+TagEditor.prototype.syncInputWidthTag = function(tag, caretPos) {
     var _tag = tag || this.getCurrentTag();
     this.ui.input.value = _tag.getValue() || '';
     this.sizeInput(_tag);
     this.positionInput(_tag);
     this.ui.input.focus();
+    if (caretPos) {
+        CaretAPI.setCaretPosition(this.ui.input, 'end');
+    }
 };
 
 TagEditor.prototype.isIndexOutOfBound = function() {
@@ -216,8 +220,10 @@ TagEditor.prototype.handleSpecialInputKeyUp = function(event) {
         //right
         log('user pressed right');
         var caret = CaretAPI.getCaretPosition(this.ui.input);
+
         var gotoNext = caret.end === this.ui.input.value.length;
-        if (gotoNext) {
+        var lastSelected = (this.getSelectedIdx() === this.tags.length - 1);
+        if (gotoNext && !lastSelected) {
             this.selectNext();
             //event.preventDefault();
             CaretAPI.setCaretPosition(this.ui.input, {
@@ -231,7 +237,8 @@ TagEditor.prototype.handleSpecialInputKeyUp = function(event) {
         log('user pressed left');
         var caret = CaretAPI.getCaretPosition(this.ui.input);
         var gotoPrev = caret.start === 0;
-        if (gotoPrev) {
+         var firstSelected = (this.getSelectedIdx() === 0);
+        if (gotoPrev && !firstSelected) {
             this.selectPrev();
             //event.preventDefault();
             CaretAPI.setCaretPosition(this.ui.input, {
@@ -292,9 +299,9 @@ TagEditor.prototype.sugestionCallback = function(arg) {
 
 TagEditor.prototype.setSugestionData = function(criteria, data) {
     console.log('retrieved data', data);
-    if (data && data.results){
+    if (data && data.results) {
         this.ui.sugWrapper.style.display = 'block';
-        for (var i = 0; i<data.results.length; i++){
+        for (var i = 0; i < data.results.length; i++) {
             var item = new TagItem(data.results[i]);
             append(this.ui.sugWrapper, item.ui.wrapper);
         }
@@ -342,8 +349,6 @@ TagEditor.prototype.onWrapperClick = function(event) {
         this.createNextTag(false);
     }
     this.syncInputWidthTag();
-    this.ui.input.focus();
-    CaretAPI.setCaretPosition(this.ui.input, end);
     var that = this;
 };
 

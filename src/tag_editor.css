@@ -34,15 +34,12 @@
     position: absolute;
     display: none;
     text-align: center;
-    
 }
-
-
 
 .tag-item-wrapper .tag-suffix-wrapper {
     top: 0px;
     right: 0px;
-     display: block;
+    display: block;
 }
 
 .tag-item-wrapper .tag-label-wrapper {
@@ -56,9 +53,8 @@
 }
 
 .tag-remove {
-    width : 16px;
+    width: 16px;
     height: 16px;
-   
 }
 
 .tag-item-wrapper {
