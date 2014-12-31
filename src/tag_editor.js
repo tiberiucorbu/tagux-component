@@ -276,16 +276,18 @@ TagEditor.prototype.createTagItem = function(value) {
     });
 };
 
-TagEditor.prototype.onTagValueChange = function(tag, changed, oldValue) {
+TagEditor.prototype.onTagValueChange = function(tag) {
     this.ui.sugWrapper.style.display = 'none';
+    
     this.ui.sugWrapper.innerHTML = '';
+    
+    console.log('listener received the value', tag.value);
     if (this.sugestionsFetchTimer) {
         window.clearTimeout(this.sugestionsFetchTimer);
         this.sugestionsFetchTimer = null;
     } else {
         this.sugestionsFetchTimer = window.setTimeout(around(this, this.sugestionCallback, null, null, {
-            newVal : changed,
-            oldVal : oldValue
+            value : tag.value
         }), 300);
     }
 };

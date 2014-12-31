@@ -20,9 +20,8 @@
 
     var firstTagEditorInstance = new TagEditor(input, {
         suggestionCallback : function(value, readyCall) {
-            
-            console.log('sugestion callback called', value.newVal);
-            readyCall(SugestionsServer.search({keyword: value.newVal}));
+            console.log('sugestion callback called', value.value);
+            readyCall(SugestionsServer.search({keyword: value.value}));
         }
     });
 

@@ -59,21 +59,23 @@ var TagItem = (function(window) {
 
     TagItem.prototype.valueChange = function(changed, value, oldValue) {
         if (this.options.valueChangeCallback) {
-            this.options.valueChangeCallback(this, value, oldValue);
+            
+            this.options.valueChangeCallback(this);
         }
     };
 
     TagItem.prototype.setValue = function(value) {
         // TODO : provide enable/disable option for this value change check
-        var changed = value !== this.value;
+
+        // var changed = value !== this.value;
         var oldValue = this.value;
-        if (changed) {
-            this.value = value;
-            var label = this.label(value);
-            this.ui.label.innerHTML = label;
-            this.ui.label.title = label;
-        }
-        this.valueChange(changed, value, oldValue);
+        // if (changed) {
+        this.value = value;
+        var label = this.label(value);
+        this.ui.label.innerHTML = label;
+        this.ui.label.title = label;
+        //}
+        this.valueChange();
     };
 
     TagItem.prototype.getValue = function() {
